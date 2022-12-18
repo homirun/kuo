@@ -18,7 +18,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"homi.run/kuo/pkg/cmd"
+	"github.com/homirun/kuo/pkg/cmd"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
