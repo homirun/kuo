@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/spf13/cobra"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"os"
+	"os/exec"
 )
 
 var (
@@ -38,8 +39,7 @@ type KuoOptions struct {
 func NewKuoOptions(streams genericclioptions.IOStreams) *KuoOptions {
 	return &KuoOptions{
 		configFlags: genericclioptions.NewConfigFlags(true),
-
-		IOStreams: streams,
+		IOStreams:   streams,
 	}
 }
 
@@ -114,15 +114,15 @@ func (o *KuoOptions) Run() error {
 	}
 
 	if o.userSpecifiedFlags == "get" {
-		o.getRouter(o.userSpecifiedContexts)
+		o.getRouter()
 	}
 
 	return nil
 }
 
-func (o *KuoOptions) getRouter(contexts []string) error {
+func (o *KuoOptions) getRouter() error {
 	if o.args[1] == "node" {
-		err := o.getNode(contexts)
+		err := o.getNode()
 		if err != nil {
 			return err
 		}
@@ -130,17 +130,21 @@ func (o *KuoOptions) getRouter(contexts []string) error {
 	return nil
 }
 
-func (o *KuoOptions) getNode(contexts []string) error {
-	config, err := o.configFlags.ToRESTConfig()
+func (o *KuoOptions) getNode() error {
+	contexts, err := o.readKuoConfig()
 	if err != nil {
 		return err
 	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+
+	for _, context := range contexts {
+		fmt.Printf("======== %s ========\n", context)
+		o.changeContext(context)
+		out, err := exec.Command("kubectl", "get", "node").Output()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s", out)
 	}
-	fmt.Printf("%#v", clientset.CoreV1().Nodes())
 	return nil
 }
 
@@ -156,6 +160,26 @@ func (o *KuoOptions) changeContext(newContext string) error {
 	return nil
 }
 
+func (o *KuoOptions) readKuoConfig() ([]string, error) {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	fp, err := os.Open(dirname + "/.kuoconfig")
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+
+	var configContexts []string
+	scanner := bufio.NewScanner(fp)
+	for scanner.Scan() {
+		configContexts = append(configContexts, scanner.Text())
+	}
+	return configContexts, nil
+}
+
 func (o *KuoOptions) editKuoConfig(contexts []string) error {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
@@ -166,8 +190,8 @@ func (o *KuoOptions) editKuoConfig(contexts []string) error {
 	if err != nil {
 		return err
 	}
-
 	defer fp.Close()
+
 	for _, v := range contexts {
 		fp.WriteString(v + "\n")
 	}
