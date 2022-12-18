@@ -97,9 +97,21 @@ func (o *KuoOptions) Validate() error {
 	if len(o.rawConfig.CurrentContext) == 0 {
 		return errNoContext
 	}
-
 	if len(o.args) > 4 {
 		return fmt.Errorf("invalid arguments")
+	}
+	if o.args[0] == "apply" {
+		for {
+			fmt.Printf("It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
+			scanner := bufio.NewScanner(os.Stdin)
+			scanner.Scan()
+			result := scanner.Text()
+			if result == "y" || result == "yes" {
+				break
+			} else if result == "n" || result == "no" {
+				os.Exit(0)
+			}
+		}
 	}
 
 	return nil
@@ -107,22 +119,12 @@ func (o *KuoOptions) Validate() error {
 
 func (o *KuoOptions) Run() error {
 	if o.userSpecifiedFlags == "set" {
-		err := o.editKuoConfig(o.userSpecifiedContexts)
+		err := o.EditKuoConfig(o.userSpecifiedContexts)
 		if err != nil {
 			return err
 		}
-	}
-
-	if o.userSpecifiedFlags == "get" {
-		o.getRouter()
-	}
-
-	return nil
-}
-
-func (o *KuoOptions) getRouter() error {
-	if o.args[1] == "node" {
-		err := o.getNode()
+	} else if o.userSpecifiedFlags != "" {
+		err := o.ExecKubectl()
 		if err != nil {
 			return err
 		}
@@ -130,16 +132,20 @@ func (o *KuoOptions) getRouter() error {
 	return nil
 }
 
-func (o *KuoOptions) getNode() error {
-	contexts, err := o.readKuoConfig()
+func (o *KuoOptions) ExecKubectl() error {
+
+	contexts, err := o.ReadKuoConfig()
 	if err != nil {
 		return err
 	}
 
 	for _, context := range contexts {
 		fmt.Printf("======== %s ========\n", context)
-		o.changeContext(context)
-		out, err := exec.Command("kubectl", "get", "node").Output()
+		err := o.ChangeContext(context)
+		if err != nil {
+			return err
+		}
+		out, err := exec.Command("kubectl", o.args...).Output()
 		if err != nil {
 			return err
 		}
@@ -148,7 +154,7 @@ func (o *KuoOptions) getNode() error {
 	return nil
 }
 
-func (o *KuoOptions) changeContext(newContext string) error {
+func (o *KuoOptions) ChangeContext(newContext string) error {
 	if o.rawConfig.CurrentContext != newContext {
 		o.rawConfig.CurrentContext = newContext
 
@@ -160,7 +166,7 @@ func (o *KuoOptions) changeContext(newContext string) error {
 	return nil
 }
 
-func (o *KuoOptions) readKuoConfig() ([]string, error) {
+func (o *KuoOptions) ReadKuoConfig() ([]string, error) {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -180,7 +186,7 @@ func (o *KuoOptions) readKuoConfig() ([]string, error) {
 	return configContexts, nil
 }
 
-func (o *KuoOptions) editKuoConfig(contexts []string) error {
+func (o *KuoOptions) EditKuoConfig(contexts []string) error {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -195,6 +201,6 @@ func (o *KuoOptions) editKuoConfig(contexts []string) error {
 	for _, v := range contexts {
 		fp.WriteString(v + "\n")
 	}
-
+	fmt.Printf("set .kuoconfig: %s\n", contexts)
 	return nil
 }
