@@ -73,7 +73,7 @@ func NewCmdKuo(streams genericclioptions.IOStreams) *cobra.Command {
 func (o *KuoOptions) Complete(cmd *cobra.Command, args []string) error {
 	o.args = args
 
-	if o.args != nil {
+	if len(o.args) > 0 {
 		o.userSpecifiedFlags = o.args[0]
 		if o.userSpecifiedFlags == "set" {
 			if len(o.args) != 3 {
@@ -99,17 +99,18 @@ func (o *KuoOptions) Validate() error {
 	}
 	if len(o.args) > 4 {
 		return fmt.Errorf("invalid arguments")
-	}
-	if o.args[0] == "apply" {
-		for {
-			fmt.Printf("It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
-			scanner := bufio.NewScanner(os.Stdin)
-			scanner.Scan()
-			result := scanner.Text()
-			if result == "y" || result == "yes" {
-				break
-			} else if result == "n" || result == "no" {
-				os.Exit(0)
+	} else if len(o.args) > 0 {
+		if o.args[0] == "apply" {
+			for {
+				fmt.Printf("It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
+				scanner := bufio.NewScanner(os.Stdin)
+				scanner.Scan()
+				result := scanner.Text()
+				if result == "y" || result == "yes" {
+					break
+				} else if result == "n" || result == "no" {
+					os.Exit(0)
+				}
 			}
 		}
 	}
@@ -123,22 +124,25 @@ func (o *KuoOptions) Run() error {
 		if err != nil {
 			return err
 		}
-	} else if o.userSpecifiedFlags != "" {
-		err := o.ExecKubectl()
+	} else {
+		contexts, err := o.ReadKuoConfig()
 		if err != nil {
 			return err
+		}
+
+		if o.userSpecifiedFlags != "" {
+			err := o.ExecKubectl(contexts)
+			if err != nil {
+				return err
+			}
+		} else {
+			fmt.Printf("%s\n", contexts)
 		}
 	}
 	return nil
 }
 
-func (o *KuoOptions) ExecKubectl() error {
-
-	contexts, err := o.ReadKuoConfig()
-	if err != nil {
-		return err
-	}
-
+func (o *KuoOptions) ExecKubectl(contexts []string) error {
 	for _, context := range contexts {
 		fmt.Printf("======== %s ========\n", context)
 		err := o.ChangeContext(context)
