@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	CONTEXT1 string = "kind"
+	CONTEXT1 string = "kind-chart-testing"
 	CONTEXT2 string = "minikube"
 )
 
