@@ -37,7 +37,7 @@ func TestCommandKuoSet(t *testing.T) {
 	_, err = exec.Command("kubectl", "kuo", "set", "CONTEXT1").Output()
 	assert.Error(t, err)
 
-	// kuo set CONTEXT1 CONTEXT2、メッセージが帰ってくる
+	// kuo set CONTEXT1 CONTEXT2で正常に処理されメッセージが帰ってくる
 	out, err = exec.Command("kubectl", "kuo", "set", CONTEXT1, CONTEXT2).Output()
 	assert.Contains(t, string(out), "set .kuoconfig: ["+CONTEXT1+" "+CONTEXT2+"]")
 }
