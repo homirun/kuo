@@ -178,6 +178,7 @@ func (o *KuoOptions) ReadKuoConfig() ([]string, error) {
 
 	fp, err := os.Open(dirname + "/.kuoconfig")
 	if err != nil {
+		err = fmt.Errorf("Contexts are not set in .kuoconfig. please run 'kubectl kuo set' to set the target contexts.")
 		return nil, err
 	}
 	defer fp.Close()
