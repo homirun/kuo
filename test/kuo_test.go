@@ -7,13 +7,8 @@ import (
 	"testing"
 )
 
-//const (
-//	CONTEXT1 string = "kind-chart-testing"
-//	CONTEXT2 string = "minikube"
-//)
-
 const (
-	CONTEXT1 string = "Default"
+	CONTEXT1 string = "kind-chart-testing"
 	CONTEXT2 string = "minikube"
 )
 
