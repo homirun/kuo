@@ -51,9 +51,9 @@ func TestCommandKuoExecKubectl(t *testing.T) {
 	assert.Error(t, err)
 
 	// kubectl applyが実行されたら警告を出す
-	out, err = exec.Command("kubectl", "kuo", "get").Output()
-	assert.NoError(t, err)
-	assert.Contains(t, string(out), "It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
+	//out, err = exec.Command("kubectl", "kuo", "apply", ).Output()
+	//assert.NoError(t, err)
+	//assert.Contains(t, string(out), "It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
 }
 
 func InitializeSetContext() {
