@@ -61,18 +61,16 @@ func NewCmdKuo(streams genericclioptions.IOStreams) *cobra.Command {
 			if err := o.Run(); err != nil {
 				return err
 			}
-
 			return nil
 		},
 	}
-	o.configFlags.AddFlags(cmd.Flags())
+	cmd.Flags().SetInterspersed(false)
 
 	return cmd
 }
 
 func (o *KuoOptions) Complete(cmd *cobra.Command, args []string) error {
 	o.args = args
-
 	if len(o.args) > 0 {
 		o.userSpecifiedFlags = o.args[0]
 		if o.userSpecifiedFlags == "set" {
