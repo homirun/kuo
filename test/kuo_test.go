@@ -6,6 +6,11 @@ import (
 	"testing"
 )
 
+const (
+	CONTEXT1 string = "kind"
+	CONTEXT2 string = "minikube"
+)
+
 func TestCommandKuo(t *testing.T) {
 	var out []byte
 	var err error
@@ -19,7 +24,7 @@ func TestCommandKuo(t *testing.T) {
 	InitializeSetContext()
 	out, err = exec.Command("kubectl", "kuo").Output()
 	assert.NoError(t, err)
-	assert.Contains(t, string(out), "[context1 context2]")
+	assert.Contains(t, string(out), "["+CONTEXT1+" "+CONTEXT2+"]")
 }
 
 func TestCommandKuoSet(t *testing.T) {
@@ -29,14 +34,28 @@ func TestCommandKuoSet(t *testing.T) {
 	// kuo setにはargsが2つ必要
 	_, err = exec.Command("kubectl", "kuo", "set").Output()
 	assert.Error(t, err)
-	_, err = exec.Command("kubectl", "kuo", "set", "context1").Output()
+	_, err = exec.Command("kubectl", "kuo", "set", "CONTEXT1").Output()
 	assert.Error(t, err)
 
-	// kuo set context1 context2はエラーにならず、メッセージが帰ってくる
-	out, err = exec.Command("kubectl", "kuo", "set", "context1", "context2").Output()
-	assert.Contains(t, string(out), "set .kuoconfig: [context1 context2]")
+	// kuo set CONTEXT1 CONTEXT2、メッセージが帰ってくる
+	out, err = exec.Command("kubectl", "kuo", "set", CONTEXT1, CONTEXT2).Output()
+	assert.Contains(t, string(out), "set .kuoconfig: ["+CONTEXT1+" "+CONTEXT2+"]")
+}
+
+func TestCommandKuoExecKubectl(t *testing.T) {
+	var out []byte
+	var err error
+
+	// kubectl getなどのbypassしたコマンドがエラーだったらkuoもエラーを返す
+	_, err = exec.Command("kubectl", "kuo", "get").Output()
+	assert.Error(t, err)
+
+	// kubectl applyが実行されたら警告を出す
+	out, err = exec.Command("kubectl", "kuo", "get").Output()
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), "It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
 }
 
 func InitializeSetContext() {
-	exec.Command("kubectl", "kuo", "set", "context1", "context2").Run()
+	exec.Command("kubectl", "kuo", "set", CONTEXT1, CONTEXT2).Run()
 }
