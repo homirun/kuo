@@ -1,4 +1,6 @@
 # kuo
+[![CI](https://github.com/homirun/kuo/actions/workflows/test.yaml/badge.svg)](https://github.com/homirun/kuo/actions/workflows/test.yaml)
+
 A kubernetes plugin that operates multiple contexts.
 
 ## Installation
