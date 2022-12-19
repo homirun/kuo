@@ -12,14 +12,17 @@ import (
 )
 
 var (
-	// TODO: いい感じに
 	kuoExample = `
-	# hogehoge
+	# show .kuoconfig
 	%[1]s kuo
-	# hogehoge
-	%[1]s kuo set-ctxs
-	# hogehoge
-	%[1]s kuo get pod
+
+	# Register contexts to be operated simultaneously.
+	%[1]s kuo set
+
+	# Execute kubectl subcommand with configured contexts.
+	%[1]s kuo [kubectl-subcommand] [flags]
+	example:
+		%[1]s kuo get node -o wide
 `
 	errNoContext = fmt.Errorf("no context is currently set, use %q to select a new one", "kubectl config use-context <context>")
 )
