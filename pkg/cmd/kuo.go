@@ -149,11 +149,11 @@ func (o *KuoOptions) ExecKubectl(contexts []string) error {
 		if err != nil {
 			return err
 		}
-		out, err := exec.Command("kubectl", o.args...).Output()
+		out, err := exec.Command("kubectl", o.args...).CombinedOutput()
+		fmt.Printf("%s", out)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s", out)
 	}
 	return nil
 }
