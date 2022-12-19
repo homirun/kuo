@@ -3,11 +3,17 @@ package test
 import (
 	"github.com/stretchr/testify/assert"
 	"os/exec"
+	"strings"
 	"testing"
 )
 
+//const (
+//	CONTEXT1 string = "kind-chart-testing"
+//	CONTEXT2 string = "minikube"
+//)
+
 const (
-	CONTEXT1 string = "kind-chart-testing"
+	CONTEXT1 string = "Default"
 	CONTEXT2 string = "minikube"
 )
 
@@ -51,9 +57,11 @@ func TestCommandKuoExecKubectl(t *testing.T) {
 	assert.Error(t, err)
 
 	// kubectl applyが実行されたら警告を出す
-	//out, err = exec.Command("kubectl", "kuo", "apply", ).Output()
-	//assert.NoError(t, err)
-	//assert.Contains(t, string(out), "It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
+	cmd := exec.Command("kubectl", "kuo", "apply")
+	cmd.Stdin = strings.NewReader("no" + "\n")
+	out, err = cmd.Output()
+	assert.NoError(t, err)
+	assert.Contains(t, string(out), "It will be applied to multiple contexts.\nDo you want to continue? (y/n)\n")
 }
 
 func InitializeSetContext() {
