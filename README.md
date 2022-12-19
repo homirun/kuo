@@ -38,12 +38,12 @@ Execute in the form `kubectl kuo [kubectl-subcommand] [flags]`.
 ```bash
 $ kubectl kuo get node -o wide
 
-======== Default ========
+======== cluster1 ========
 NAME    STATUS   ROLES           AGE   VERSION       INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
 chino   Ready    control-plane   26d   v1.25.4+k0s   10.x.y.124       <none>        Ubuntu 22.04.1 LTS   xxxxxxxxxxxxxxxxx   containerd://x.y.z
 maya    Ready    <none>          26d   v1.25.4+k0s   10.x.y.88        <none>        Ubuntu 22.04.1 LTS   xxxxxxxxxxxxxxxxx   containerd://x.y.z
 megu    Ready    <none>          26d   v1.25.4+k0s   10.x.y.112       <none>        Ubuntu 22.04.1 LTS   xxxxxxxxxxxxxxxxx   containerd://x.y.z
-======== minikube ========
+======== cluster2 ========
 NAME       STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE               KERNEL-VERSION   CONTAINER-RUNTIME
 minikube   Ready    control-plane   22h   v1.25.3   192.x.y.2      <none>        Buildroot 2021.02.12   x.y.z            docker://x.y.z
 
