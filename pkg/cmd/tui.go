@@ -7,12 +7,18 @@ import (
 )
 
 type firstColumn struct {
+	tuiMode
 	context       string
 	kubectlStdOut string
 }
 type secondColumn struct {
+	tuiMode
 	context       string
 	kubectlStdOut string
+}
+
+type tuiMode struct {
+	mode string
 }
 
 func ShowTui(kubectlStdOutputMaps map[string]string, tuiMode string) error {
@@ -32,8 +38,10 @@ func ShowTui(kubectlStdOutputMaps map[string]string, tuiMode string) error {
 	fc := new(firstColumn)
 	sc := new(secondColumn)
 
+	fc.tuiMode.mode = tuiMode
 	fc.context = contexts[0]
 	fc.kubectlStdOut = outputs[0]
+	sc.tuiMode.mode = tuiMode
 	sc.context = contexts[1]
 	sc.kubectlStdOut = outputs[1]
 
@@ -52,23 +60,41 @@ func ShowTui(kubectlStdOutputMaps map[string]string, tuiMode string) error {
 
 func (fc *firstColumn) Layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("firstColumn", 0, 0, maxX/2-1, maxY); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
+	if fc.tuiMode.mode == "h" {
+		if v, err := g.SetView("firstColumn", 0, 0, maxX-1, maxY/2-1); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
+			}
+			fmt.Fprintln(v, fc.kubectlStdOut)
 		}
-		fmt.Fprintln(v, fc.kubectlStdOut)
+	} else {
+		if v, err := g.SetView("firstColumn", 0, 0, maxX/2-1, maxY-1); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
+			}
+			fmt.Fprintln(v, fc.kubectlStdOut)
+		}
 	}
 
 	return nil
 }
 
-func (fc *secondColumn) Layout(g *gocui.Gui) error {
+func (sc *secondColumn) Layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("SecondColumn", maxX/2+1, 0, maxX-1, maxY); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
+	if sc.tuiMode.mode == "h" {
+		if v, err := g.SetView("SecondColumn", 0, maxY/2, maxX-1, maxY-1); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
+			}
+			fmt.Fprintln(v, sc.kubectlStdOut)
 		}
-		fmt.Fprintln(v, fc.kubectlStdOut)
+	} else {
+		if v, err := g.SetView("SecondColumn", maxX/2, 0, maxX-1, maxY-1); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
+			}
+			fmt.Fprintln(v, sc.kubectlStdOut)
+		}
 	}
 
 	return nil
