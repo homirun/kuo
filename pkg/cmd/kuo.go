@@ -147,7 +147,7 @@ func (o *KuoOptions) Run() error {
 			if err != nil {
 				return err
 			}
-		} else if o.userSpecifiedFlags == "" {
+		} else if o.userSpecifiedFlags != "" {
 			kubectlStdOuts, err := o.ExecKubectl(contexts)
 			if err != nil {
 				return err
