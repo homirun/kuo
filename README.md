@@ -34,7 +34,9 @@ minikube   Ready    control-plane   122m   v1.25.3
 ```
 
 ### Execute kubectl subcommand with configured contexts
-Execute in the form `kubectl kuo [kubectl-subcommand] [flags]`.
+Execute in the form `kubectl kuo [tuimode] [kubectl-subcommand] [flags]`.
+
+#### Basic
 ```bash
 $ kubectl kuo get node -o wide
 
@@ -47,4 +49,48 @@ megu    Ready    <none>          26d   v1.25.4+k0s   10.x.y.112       <none>    
 NAME       STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE               KERNEL-VERSION   CONTAINER-RUNTIME
 minikube   Ready    control-plane   22h   v1.25.3   192.x.y.2      <none>        Buildroot 2021.02.12   x.y.z            docker://x.y.z
 
+```
+
+#### Use TuiMode
+Tui mode provides a tui-like interface. tui mode is optional flag.
+This is an experimental feature.
+
+- v Displayed vertically split.
+- h Displayed horizontally split.
+
+```bash
+$ kubectl kuo v get node -o wide
+
+┌─────────────────────────────────────────────────────┐┌──────────────────────────────────────────────────────┐
+│NAME    STATUS   ROLES           AGE   VERSION       ││NAME       STATUS   ROLES           AGE     VERSION   │
+│chino   Ready    control-plane   32d   v1.25.4+k0s   ││minikube   Ready    control-plane   6d23h   v1.25.3   │
+│maya    Ready    <none>          32d   v1.25.4+k0s   ││                                                      │
+│megu    Ready    <none>          32d   v1.25.4+k0s   ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+│                                                     ││                                                      │
+└─────────────────────────────────────────────────────┘└──────────────────────────────────────────────────────┘
 ```
