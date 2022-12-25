@@ -59,7 +59,7 @@ This is an experimental feature.
 - h Displayed horizontally split.
 
 ```bash
-$ kubectl kuo v get node -o wide
+$ kubectl kuo v get node
 
 ┌─────────────────────────────────────────────────────┐┌──────────────────────────────────────────────────────┐
 │NAME    STATUS   ROLES           AGE   VERSION       ││NAME       STATUS   ROLES           AGE     VERSION   │
