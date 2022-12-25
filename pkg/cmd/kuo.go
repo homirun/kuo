@@ -20,10 +20,16 @@ var (
 	%[1]s kuo set
 
 	# Execute kubectl subcommand with configured contexts.
-	%[1]s kuo [kubectl-subcommand] [flags]
+	# tui mode provides a tui-like interface. tui mode is optional flag.
+	# v: Displayed vertically split.
+	# h: Displayed horizontally split.
+
+	%[1]s kuo [tui mode] [kubectl-subcommand] [flags]
 	example:
 		%[1]s kuo get node -o wide
+		%[1]s kuo get v node -o wide
 `
+
 	errNoContext = fmt.Errorf("no context is currently set, use %q to select a new one", "kubectl config use-context <context>")
 )
 
@@ -131,11 +137,22 @@ func (o *KuoOptions) Run() error {
 			return err
 		}
 
-		if o.userSpecifiedFlags != "" {
-			err := o.ExecKubectl(contexts)
+		if o.userSpecifiedFlags == "v" || o.userSpecifiedFlags == "h" {
+			o.args = append(o.args[:0], o.args[1:]...)
+			kubectlStdOuts, err := o.ExecKubectl(contexts)
 			if err != nil {
 				return err
 			}
+			err = ShowTui(kubectlStdOuts, o.userSpecifiedFlags)
+			if err != nil {
+				return err
+			}
+		} else if o.userSpecifiedFlags == "" {
+			kubectlStdOuts, err := o.ExecKubectl(contexts)
+			if err != nil {
+				return err
+			}
+			o.ShowCmdLine(kubectlStdOuts)
 		} else {
 			fmt.Printf("%s\n", contexts)
 		}
@@ -143,20 +160,27 @@ func (o *KuoOptions) Run() error {
 	return nil
 }
 
-func (o *KuoOptions) ExecKubectl(contexts []string) error {
+func (o *KuoOptions) ExecKubectl(contexts []string) (map[string]string, error) {
+	kubectlStdOutMaps := map[string]string{}
 	for _, context := range contexts {
-		fmt.Printf("======== %s ========\n", context)
 		err := o.ChangeContext(context)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		out, err := exec.Command("kubectl", o.args...).CombinedOutput()
-		fmt.Printf("%s", out)
 		if err != nil {
-			return err
+			return nil, err
 		}
+		kubectlStdOutMaps[context] = string(out)
 	}
-	return nil
+	return kubectlStdOutMaps, nil
+}
+
+func (o *KuoOptions) ShowCmdLine(outputs map[string]string) {
+	for context, output := range outputs {
+		fmt.Printf("======== %s ========\n", context)
+		fmt.Printf("%s\n", output)
+	}
 }
 
 func (o *KuoOptions) ChangeContext(newContext string) error {
