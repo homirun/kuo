@@ -61,7 +61,7 @@ This is an experimental feature.
 ```bash
 $ kubectl kuo v get node
 
-┌─────────────────────────────────────────────────────┐┌──────────────────────────────────────────────────────┐
+┌─Default─────────────────────────────────────────────┐┌─minikube─────────────────────────────────────────────┐
 │NAME    STATUS   ROLES           AGE   VERSION       ││NAME       STATUS   ROLES           AGE     VERSION   │
 │chino   Ready    control-plane   32d   v1.25.4+k0s   ││minikube   Ready    control-plane   6d23h   v1.25.3   │
 │maya    Ready    <none>          32d   v1.25.4+k0s   ││                                                      │
