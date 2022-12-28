@@ -65,6 +65,7 @@ func (fc *firstColumn) Layout(g *gocui.Gui) error {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
+			v.Title = fc.context
 			fmt.Fprintln(v, fc.kubectlStdOut)
 		}
 	} else {
@@ -72,6 +73,7 @@ func (fc *firstColumn) Layout(g *gocui.Gui) error {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
+			v.Title = fc.context
 			fmt.Fprintln(v, fc.kubectlStdOut)
 		}
 	}
@@ -86,6 +88,7 @@ func (sc *secondColumn) Layout(g *gocui.Gui) error {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
+			v.Title = sc.context
 			fmt.Fprintln(v, sc.kubectlStdOut)
 		}
 	} else {
@@ -93,6 +96,7 @@ func (sc *secondColumn) Layout(g *gocui.Gui) error {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
+			v.Title = sc.context
 			fmt.Fprintln(v, sc.kubectlStdOut)
 		}
 	}
